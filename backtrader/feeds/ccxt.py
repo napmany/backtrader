@@ -123,6 +123,9 @@ class CCXT(DataBase):
             dlen = len(self._data)
             for ohlcv in self.store.fetch_ohlcv(self.symbol, timeframe=granularity,
                                                 since=since, limit=limit)[::-1]:
+                if None in ohlcv:
+                    continue
+
                 tstamp = ohlcv[0]
                 if tstamp > self._last_ts:
                     self._data.append(ohlcv)
@@ -150,7 +153,7 @@ class CCXT(DataBase):
         try:
             trade = self._data.popleft()
         except IndexError:
-            return False # no data in the queue
+            return None # no data in the queue
 
         trade_time, price, size = trade
 
@@ -167,7 +170,7 @@ class CCXT(DataBase):
         try:
             ohlcv = self._data.popleft()
         except IndexError:
-            return False # no data in the queue
+            return None # no data in the queue
 
         tstamp, open_, high, low, close, volume = ohlcv
 
